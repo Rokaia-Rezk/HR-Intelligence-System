@@ -1,25 +1,24 @@
 """
 app.py
 ------
-Entry point. This now uses st.navigation() instead of the automatic
-pages/ folder navigation, for one specific reason: Streamlit ALWAYS
-renders the folder-based nav at the very top of the sidebar, before
-anything your own code adds to st.sidebar — that's exactly why the
-logo kept ending up below the page list instead of above it.
+Entry point. st.navigation() has a quirk: it reserves a fixed slot for
+the page-list nav near the top of the sidebar, regardless of where in
+the code it's called from — that's why the logo kept ending up BELOW
+the nav no matter what order render_sidebar_logo() and st.navigation()
+were called in.
 
-st.navigation() renders the nav wherever it's called, so calling
-render_sidebar_logo() first and st.navigation() second guarantees the
-logo sits above the page list, like the Power BI reference layout.
+The fix: position="hidden" tells st.navigation() to still handle
+routing (which page is active, URL paths, etc.) but render NO nav UI
+of its own. We then build the sidebar by hand with st.page_link(), so
+the vertical order — logo, then pages, then social links — is
+whatever WE put it in and can never be overridden internally again.
 """
 
 import streamlit as st
-from style import apply_custom_theme, render_sidebar_logo
+from style import apply_custom_theme, render_sidebar_logo, render_sidebar_socials
 
 st.set_page_config(page_title="HR Intelligence System", layout="wide")
 apply_custom_theme()
-
-with st.sidebar:
-    render_sidebar_logo()
 
 pages = [
     st.Page("views/home.py", title="Home", default=True),
@@ -30,5 +29,20 @@ pages = [
     st.Page("views/recruitment.py", title="Recruitment"),
     st.Page("views/predictive_attrition.py", title="Predictive Attrition"),
 ]
-pg = st.navigation(pages)
+pg = st.navigation(pages, position="hidden")
+
+with st.sidebar:
+    render_sidebar_logo()
+    for page in pages:
+        if page.url_path == pg.url_path:
+            # st.page_link decides the "active" look itself in JS and never
+            # exposes it as an HTML attribute we could style — so instead
+            # we mark the active page from Python (comparing against pg,
+            # the Page st.navigation() says is currently running) and let
+            # the CSS in style.py pick up this marker via :has().
+            st.markdown('<div class="active-page-marker"></div>', unsafe_allow_html=True)
+        st.page_link(page)
+    render_sidebar_socials()
+
 pg.run()
+
