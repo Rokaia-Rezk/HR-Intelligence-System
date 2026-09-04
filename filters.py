@@ -77,3 +77,18 @@ def style_slices(fig):
     separated instead of blending into one blob."""
     fig.update_traces(marker=dict(line=dict(color="#FFFFFF", width=2)))
     return fig
+
+
+def get_click_index(key):
+    """Read a plotly chart's current click selection (a category point
+    index) straight from session_state, without needing that chart to
+    render first in the current script run. This is what makes
+    click-to-filter cross-filtering possible: every OTHER chart on the
+    page can know what was clicked before it builds its own data,
+    regardless of render order."""
+    ev = st.session_state.get(key)
+    if ev is not None:
+        points = getattr(getattr(ev, "selection", None), "points", None)
+        if points:
+            return points[0]["point_index"]
+    return None
