@@ -29,28 +29,6 @@ from data_loader import load_standard_data
 from filters import department_status_filters, style_fig
 
 
-
-import streamlit as st
-from style import apply_custom_theme, render_sidebar_logo
-from data_loader import load_raw_data, load_standard_data
-
-# 1. إعداد الصفحة الأساسية
-st.set_page_config(page_title="HR System", layout="wide")
-
-# 2. تطبيق الستايل المخصص واللوجو
-apply_custom_theme()
-render_sidebar_logo()
-
-# 3. باقي كود الصفحة والتحليلات
-st.title("HR Intelligence System")
-
-
-
-
-
-
-
-
 st.title("Finance & Compensation Intelligence")
 st.caption("Comprehensive payroll distribution, departmental cost structure, and executive compensation analysis.")
 
