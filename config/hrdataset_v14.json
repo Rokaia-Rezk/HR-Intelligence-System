@@ -1,0 +1,20 @@
+{
+  "employee_id": "EmpID",
+  "employee_name": "Employee_Name",
+  "department": "Department",
+  "position": "Position",
+  "salary": "Salary",
+  "employment_status": "EmploymentStatus",
+  "hire_date": "DateofHire",
+  "termination_date": "DateofTermination",
+  "termination_reason": "TermReason",
+  "performance_score": "PerformanceScore",
+  "engagement_score": "EngagementSurvey",
+  "satisfaction_score": "EmpSatisfaction",
+  "absences": "Absences",
+  "days_late": "DaysLateLast30",
+  "special_projects_count": "SpecialProjectsCount",
+  "manager_name": "ManagerName",
+  "gender": "Sex",
+  "recruitment_source": "RecruitmentSource"
+}
