@@ -26,8 +26,7 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 from data_loader import load_standard_data
-from filters import department_status_filters, style_fig
-
+from filters import department_status_filters, style_fig, get_click_index
 
 st.title("Finance & Compensation Intelligence")
 st.caption("Comprehensive payroll distribution, departmental cost structure, and executive compensation analysis.")
@@ -59,17 +58,6 @@ bin_labels = [f"${int(bin_edges[i]):,}\u2013${int(bin_edges[i+1]):,}" for i in r
 df["salary_bin"] = pd.cut(df["salary"], bins=bin_edges, labels=bin_labels, include_lowest=True)
 
 CHART_KEYS = ["finance_dept_chart", "finance_bin_chart", "finance_perf_chart", "finance_status_chart"]
-
-
-def get_click_index(key):
-    """Read a chart's current click selection (a category index) straight
-    from session_state, without needing that chart to render first."""
-    ev = st.session_state.get(key)
-    if ev is not None:
-        points = getattr(getattr(ev, "selection", None), "points", None)
-        if points:
-            return points[0]["point_index"]
-    return None
 
 
 dept_idx = get_click_index("finance_dept_chart")
