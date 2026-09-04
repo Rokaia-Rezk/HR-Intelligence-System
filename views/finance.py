@@ -54,7 +54,10 @@ FIXED_STATUS = [(True, "Active"), (False, "Terminated")]
 
 n_bins = min(8, df["salary"].nunique())
 bin_edges = np.linspace(df["salary"].min(), df["salary"].max(), n_bins + 1)
-bin_labels = [f"${int(bin_edges[i]):,}\u2013${int(bin_edges[i+1]):,}" for i in range(n_bins)]
+# Compact "$45K–$70K" labels instead of "$45,046–$70,665" — the long
+# version forces Plotly into a steep auto-rotation that reads as a
+# cascading diagonal mess once the chart sits in a half-width card.
+bin_labels = [f"${int(bin_edges[i]/1000)}K\u2013${int(bin_edges[i+1]/1000)}K" for i in range(n_bins)]
 df["salary_bin"] = pd.cut(df["salary"], bins=bin_edges, labels=bin_labels, include_lowest=True)
 
 CHART_KEYS = ["finance_dept_chart", "finance_bin_chart", "finance_perf_chart", "finance_status_chart"]
@@ -121,7 +124,9 @@ with col1:
     dept_agg = dept_data.groupby("department")["salary"].mean().reindex(FIXED_DEPTS).reset_index()
     fig = px.bar(dept_agg, x="department", y="salary", color_discrete_sequence=["#9575CD"])
     fig.update_yaxes(tickprefix="$", tickformat=",.0f")
-    st.plotly_chart(style_fig(fig), use_container_width=True, theme=None,
+    fig = style_fig(fig)
+    fig.update_xaxes(tickangle=-25)
+    st.plotly_chart(fig, width='stretch', theme=None,
                      on_select="rerun", selection_mode="points", key="finance_dept_chart")
     top_dept = dept_agg.dropna().sort_values("salary", ascending=False).iloc[0] if dept_agg["salary"].notna().any() else None
     if top_dept is not None:
@@ -136,7 +141,9 @@ with col2:
     bin_agg.columns = ["salary_bin", "count"]
     fig2 = px.bar(bin_agg, x="salary_bin", y="count", color_discrete_sequence=["#7C5CBF"])
     fig2.update_layout(xaxis_title="Salary Range", yaxis_title="Employees")
-    st.plotly_chart(style_fig(fig2), use_container_width=True, theme=None,
+    fig2 = style_fig(fig2)
+    fig2.update_xaxes(tickangle=-20)
+    st.plotly_chart(fig2, width='stretch', theme=None,
                      on_select="rerun", selection_mode="points", key="finance_bin_chart")
     if bin_agg["count"].sum() > 0:
         top_bin = bin_agg.sort_values("count", ascending=False).iloc[0]
@@ -147,7 +154,7 @@ st.subheader("Top Compensation Roster")
 top_paid = df_view.sort_values("salary", ascending=False)[
     ["employee_name", "department", "position", "salary"]
 ].head(10)
-st.dataframe(top_paid, use_container_width=True)
+st.dataframe(top_paid, width='stretch')
 
 st.divider()
 st.subheader("Compensation vs. Retention")
@@ -162,7 +169,9 @@ with col3:
         perf_agg = perf_data.groupby("performance_score")["salary"].mean().reindex(FIXED_PERF).reset_index()
         fig3 = px.bar(perf_agg, x="performance_score", y="salary", color_discrete_sequence=["#5B3E96"])
         fig3.update_yaxes(tickprefix="$", tickformat=",.0f")
-        st.plotly_chart(style_fig(fig3), use_container_width=True, theme=None,
+        fig3 = style_fig(fig3)
+        fig3.update_xaxes(tickangle=-20)
+        st.plotly_chart(fig3, width='stretch', theme=None,
                          on_select="rerun", selection_mode="points", key="finance_perf_chart")
         if perf_agg["salary"].notna().any():
             top_tier = perf_agg.dropna().sort_values("salary", ascending=False).iloc[0]
@@ -181,7 +190,8 @@ with col4:
     fig4 = px.bar(x=status_labels, y=status_values, color_discrete_sequence=["#B39DDB", "#5B3E96"])
     fig4.update_yaxes(tickprefix="$", tickformat=",.0f")
     fig4.update_layout(xaxis_title="", yaxis_title="Average Salary")
-    st.plotly_chart(style_fig(fig4), use_container_width=True, theme=None,
+    fig4 = style_fig(fig4)
+    st.plotly_chart(fig4, width='stretch', theme=None,
                      on_select="rerun", selection_mode="points", key="finance_status_chart")
     if pd.notna(status_agg.get(True, np.nan)) and pd.notna(status_agg.get(False, np.nan)):
         gap = status_agg[True] - status_agg[False]
