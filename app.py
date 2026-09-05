@@ -16,19 +16,30 @@ whatever WE put it in and can never be overridden internally again.
 
 import streamlit as st
 from style import apply_custom_theme, render_sidebar_logo, render_sidebar_socials
+from data_loader import field_has_data
 
 st.set_page_config(page_title="HR Intelligence System", layout="wide")
 apply_custom_theme()
 
+# Performance and Attendance each lean entirely on a handful of fields
+# (performance_score / engagement / satisfaction for one, absences /
+# days_late for the other). If NONE of a page's fields exist in the
+# currently active dataset (default or uploaded), there's nothing real
+# for that page to show, so it's left out of the sidebar rather than
+# opening onto an empty or crashing page.
 pages = [
     st.Page("views/home.py", title="Home", default=True),
+    st.Page("views/upload_data.py", title="Upload Data"),
     st.Page("views/data_cleaning.py", title="Data Cleaning"),
     st.Page("views/finance.py", title="Finance"),
-    st.Page("views/performance.py", title="Performance"),
-    st.Page("views/attendance.py", title="Attendance"),
-    st.Page("views/recruitment.py", title="Recruitment"),
-    st.Page("views/predictive_attrition.py", title="Predictive Attrition"),
 ]
+if any(field_has_data(f) for f in
+       ["performance_score", "engagement_score", "satisfaction_score", "special_projects_count"]):
+    pages.append(st.Page("views/performance.py", title="Performance"))
+if any(field_has_data(f) for f in ["absences", "days_late"]):
+    pages.append(st.Page("views/attendance.py", title="Attendance"))
+pages.append(st.Page("views/recruitment.py", title="Recruitment"))
+pages.append(st.Page("views/predictive_attrition.py", title="Predictive Attrition"))
 pg = st.navigation(pages, position="hidden")
 
 with st.sidebar:
