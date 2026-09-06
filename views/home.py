@@ -2,8 +2,33 @@ import streamlit as st
 from data_loader import load_raw_data, load_standard_data, active_dataset_name
 from style import kpi_icon_card, render_kpi_row, ICON_DATABASE, ICON_PEOPLE, ICON_GRID, ICON_DOLLAR
 
+README_URL = "https://github.com/Rokaia-Rezk/HR-Intelligence-System#readme"
+
 st.title("HR Intelligence System")
 st.caption("Dataset-agnostic human resources analytics and automated data engineering pipeline.")
+
+st.markdown(
+    "**What this is:** most HR dashboards are secretly built around one specific spreadsheet — "
+    "rename a column and the whole thing breaks. This one isn't. Upload any reasonably-shaped HR "
+    "export (CSV or Excel) and the system automatically maps your columns to a standard schema, "
+    "cleans the data with every decision logged, and adapts every page to whatever fields your "
+    "data actually has."
+)
+st.markdown(
+    "**How to use it:** the dashboard below is already exploring a sample dataset — browse the "
+    "pages in the sidebar to see it in action. To analyze your own data instead, go to **Upload "
+    "Data**, confirm how your columns map to the standard fields, and every page updates instantly."
+)
+st.markdown(
+    f"**About the sample data:** the dataset loaded by default (`{active_dataset_name()}`) is a "
+    "general-purpose HR dataset — this system's Recruitment and Predictive Attrition pages in "
+    "particular are built around its central question, **employee attrition**: who leaves, when, "
+    "and why."
+)
+st.markdown(f"For the full technical write-up — architecture, the cleaning rules, how the "
+            f"prediction model works — see the [project README]({README_URL}).")
+
+st.divider()
 
 df_raw = load_raw_data()
 df_cleaned = load_standard_data()
