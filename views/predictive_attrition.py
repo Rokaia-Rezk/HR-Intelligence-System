@@ -98,7 +98,7 @@ importances = importances.sort_values(ascending=True)
 fig_imp = px.bar(x=importances.values, y=importances.index, orientation="h",
                   color_discrete_sequence=["#7C5CBF"])
 fig_imp.update_layout(xaxis_title="Relative Importance", yaxis_title="")
-st.plotly_chart(style_fig(fig_imp), use_container_width=True, theme=None)
+st.plotly_chart(style_fig(fig_imp), width='stretch', theme=None)
 top_feat = importances.index[-1]
 st.caption(f"**{top_feat}** is the single strongest predictor of attrition in this dataset.")
 
@@ -130,7 +130,100 @@ else:
     watchlist = active_df.sort_values("risk_score", ascending=False)[display_cols].head(15)
     watchlist = watchlist.rename(columns={"risk_score": "Risk Score", "risk_band": "Risk Band"})
     watchlist["Risk Score"] = watchlist["Risk Score"].round(2)
-    st.dataframe(watchlist, use_container_width=True)
+    st.dataframe(watchlist, width='stretch')
 
     st.caption("Highest-risk employees to prioritize for a retention conversation, based on how "
                "closely their profile matches employees who have left before.")
+
+st.divider()
+
+# ---- Score a single, hand-entered employee ----------------------------------
+st.subheader("Score a Specific Employee")
+st.caption("Enter someone's details — a real employee, or a candidate you're evaluating — and get "
+           "the same risk score the model above gives everyone else, plus which specific inputs "
+           "are driving it.")
+
+# Whether more of a feature is generally a good or bad sign, for writing a
+# recommendation in plain language. This is a simple domain heuristic (not
+# learned from the model) — it only decides how a flagged input gets worded,
+# never which features get flagged (that's still driven by feature_importances_).
+DIRECTION = {
+    "salary": "higher_is_better", "engagement_score": "higher_is_better",
+    "satisfaction_score": "higher_is_better", "special_projects_count": "higher_is_better",
+    "absences": "higher_is_worse", "days_late": "higher_is_worse",
+}
+
+with st.form("score_employee_form"):
+    inputs = {}
+    form_cols = st.columns(2)
+    active_pop = model_df[model_df["is_active"]]  # for setting sensible ranges/defaults
+
+    for i, col in enumerate(available_numeric):
+        with form_cols[i % 2]:
+            col_min, col_max = float(model_df[col].min()), float(model_df[col].max())
+            col_default = float(active_pop[col].median()) if len(active_pop) else float(model_df[col].median())
+            step = 1000.0 if col == "salary" else (0.1 if col in ("engagement_score", "satisfaction_score") else 1.0)
+            inputs[col] = st.number_input(col.replace("_", " ").title(), min_value=col_min,
+                                           max_value=col_max, value=col_default, step=step,
+                                           key=f"score_{col}")
+    for i, col in enumerate(available_categorical):
+        with form_cols[(len(available_numeric) + i) % 2]:
+            choices = list(encoders[col].classes_)
+            inputs[col] = st.selectbox(col.replace("_", " ").title(), choices, key=f"score_{col}")
+
+    submitted = st.form_submit_button("Score This Employee")
+
+if submitted:
+    row = {}
+    for col in available_numeric:
+        row[col] = inputs[col]
+    for col in available_categorical:
+        row[col + "_enc"] = encoders[col].transform([inputs[col]])[0]
+    input_df = pd.DataFrame([row])[feature_cols]
+
+    risk = clf.predict_proba(input_df)[0, 1]
+    band = "High" if risk >= 0.66 else "Medium" if risk >= 0.33 else "Low"
+    band_color = {"High": "🔴", "Medium": "🟡", "Low": "🟢"}[band]
+
+    rc1, rc2 = st.columns([1, 2])
+    with rc1:
+        st.metric("Attrition Risk", f"{risk:.0%}", help="Model's estimated probability this person leaves.")
+        st.markdown(f"### {band_color} {band} Risk")
+
+    with rc2:
+        # Flag whichever of THIS person's inputs look concerning, restricted to
+        # the model's own top predictors — so the explanation reflects what the
+        # model actually weighs, not every field regardless of relevance.
+        ranked_features = importances.sort_values(ascending=False).index.tolist()
+        notes = []
+        for feat in ranked_features:
+            if feat not in inputs or feat not in DIRECTION or len(active_pop) < 5:
+                continue
+            percentile = (active_pop[feat] < inputs[feat]).mean()
+            direction = DIRECTION[feat]
+            concerning = (direction == "higher_is_better" and percentile <= 0.25) or \
+                         (direction == "higher_is_worse" and percentile >= 0.75)
+            if concerning:
+                label = feat.replace("_", " ")
+                notes.append(f"their **{label}** ({inputs[feat]:g}) is worse than about "
+                             f"{(1 - percentile) * 100:.0f}% of the current active workforce" if direction == "higher_is_better"
+                             else f"their **{label}** ({inputs[feat]:g}) is higher than about "
+                                  f"{percentile * 100:.0f}% of the current active workforce")
+            if len(notes) >= 2:
+                break
+
+        if band == "High":
+            headline = "This profile closely resembles people who have already left — worth a direct, prompt retention conversation."
+        elif band == "Medium":
+            headline = "Some risk signals here, but not a clear match to people who've left — worth keeping an eye on rather than acting urgently."
+        else:
+            headline = "This profile looks similar to employees who've stayed — no action indicated based on this alone."
+
+        if notes:
+            st.markdown(f"{headline} Specifically, {', and '.join(notes)}.")
+        else:
+            st.markdown(headline)
+
+        st.caption("This is a model estimate based on patterns in historical data, not a diagnosis of "
+                   "this individual — use it to prioritize a conversation, not to replace one.")
+
