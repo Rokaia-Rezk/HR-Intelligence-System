@@ -26,9 +26,16 @@ def cast_canonical_types(df):
     return df
 
 
-def add_is_active(df):
+def add_is_active(df, is_active_series=None):
+    """Compute is_active. If is_active_series is given (e.g. derived from
+    an Attrition Yes/No or 1/0 flag column — see views/upload_data.py's
+    'I don't have a termination date' option), it's used directly, no
+    real termination_date needed. Otherwise falls back to the normal
+    termination_date-is-empty-means-active rule."""
     df = df.copy()
-    if "termination_date" in df.columns:
+    if is_active_series is not None:
+        df["is_active"] = is_active_series.reindex(df.index).fillna(True).astype(bool)
+    elif "termination_date" in df.columns:
         df["is_active"] = df["termination_date"].isna()
     else:
         df["is_active"] = True

@@ -88,10 +88,17 @@ if df_raw is not None:
     NOT_PRESENT = "— not present —"
     options = [NOT_PRESENT] + raw_columns
 
+    # Values that commonly mean "this person has left" when a dataset
+    # tracks attrition as a flag instead of an actual date — pre-selected
+    # automatically so the common Yes/No or 1/0 case needs zero extra clicks.
+    LEFT_KEYWORDS = {"yes", "y", "true", "1", "1.0", "terminated", "left", "resigned", "quit"}
+
     confirmed_mapping = {}
     missing_required = []
 
     for field, meta in CANONICAL_FIELDS.items():
+        if field == "termination_date":
+            continue  # handled specially below — date OR flag column
         guessed = auto_mapping.get(field)
         default_index = options.index(guessed) if guessed in options else 0
         label = f"{field} {'(required)' if meta['required'] else ''}".strip()
@@ -103,6 +110,39 @@ if df_raw is not None:
         if meta["required"] and confirmed_mapping[field] is None:
             missing_required.append(field)
 
+    st.markdown("**termination_date** — or use an attrition flag instead")
+    use_flag = st.checkbox(
+        "I don't have an exact termination date — I have a Yes/No (or 1/0) "
+        "'has this person left' column instead",
+        key="use_attrition_flag",
+    )
+    attrition_flag_col = None
+    attrition_left_values = []
+    if use_flag:
+        confirmed_mapping["termination_date"] = None
+        flag_guess = auto_mapping.get("termination_reason")  # no dedicated alias list for this; best-effort only
+        flag_default = options.index(flag_guess) if flag_guess in options else 0
+        attrition_flag_col = st.selectbox(
+            "Which column indicates whether they left?", options,
+            index=flag_default, key="attrition_flag_col",
+        )
+        if attrition_flag_col != NOT_PRESENT:
+            unique_vals = [v for v in df_raw[attrition_flag_col].dropna().unique().tolist()]
+            guessed_left = [v for v in unique_vals if str(v).strip().lower() in LEFT_KEYWORDS]
+            attrition_left_values = st.multiselect(
+                "Which value(s) mean 'has left the company'?", unique_vals,
+                default=guessed_left, key="attrition_left_values",
+                help="Everything else in this column is treated as still active.",
+            )
+    else:
+        guessed = auto_mapping.get("termination_date")
+        default_index = options.index(guessed) if guessed in options else 0
+        chosen = st.selectbox(
+            "termination_date", options, index=default_index, key="map_termination_date",
+            help=CANONICAL_FIELDS["termination_date"]["description"],
+        )
+        confirmed_mapping["termination_date"] = None if chosen == NOT_PRESENT else chosen
+
     if missing_required:
         st.warning(f"Still need a column for: {', '.join(missing_required)} — "
                    "these are required for the analytics pages to work.")
@@ -111,7 +151,17 @@ if df_raw is not None:
         mapped_df = apply_mapping(df_raw, confirmed_mapping)
         mapped_df = cast_canonical_types(mapped_df)
         standard_df, audit_log = clean_standard_data(mapped_df)
-        standard_df = add_is_active(standard_df)
+
+        if use_flag and attrition_flag_col and attrition_flag_col != NOT_PRESENT and attrition_left_values:
+            has_left = df_raw[attrition_flag_col].isin(attrition_left_values)
+            standard_df = add_is_active(standard_df, is_active_series=~has_left)
+            audit_log = list(audit_log) + [
+                f"'is_active' computed from '{attrition_flag_col}' — "
+                f"{int(has_left.sum())} employee(s) matched {attrition_left_values} and were marked terminated "
+                f"(no real termination_date, so tenure-based charts won't have data)."
+            ]
+        else:
+            standard_df = add_is_active(standard_df)
 
         st.session_state["uploaded_raw_df"] = df_raw
         st.session_state["uploaded_mapped_df"] = mapped_df

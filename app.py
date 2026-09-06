@@ -39,6 +39,7 @@ if any(field_has_data(f) for f in
 if any(field_has_data(f) for f in ["absences", "days_late"]):
     pages.append(st.Page("views/attendance.py", title="Attendance"))
 pages.append(st.Page("views/recruitment.py", title="Recruitment"))
+pages.append(st.Page("views/recommendations.py", title="Recommended Actions"))
 pages.append(st.Page("views/predictive_attrition.py", title="Predictive Attrition"))
 pg = st.navigation(pages, position="hidden")
 
