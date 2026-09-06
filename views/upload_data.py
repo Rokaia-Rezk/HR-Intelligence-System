@@ -48,6 +48,8 @@ else:
     st.info(f"Currently active dataset: **{current_source}** (bundled sample)")
 
 uploaded_file = st.file_uploader("Upload a CSV or Excel file", type=["csv", "xlsx", "xls"])
+st.caption("Limit 200MB per file. Working with a much bigger export? Sample it down first — "
+           "a few thousand rows is plenty to demonstrate the pipeline.")
 
 if uploaded_file is not None:
     try:
