@@ -12,6 +12,10 @@ routing (which page is active, URL paths, etc.) but render NO nav UI
 of its own. We then build the sidebar by hand with st.page_link(), so
 the vertical order — logo, then pages, then social links — is
 whatever WE put it in and can never be overridden internally again.
+
+"Welcome" is the register's title page and opens first (default=True).
+It's a plain cover — text only, no stock photo — with a table of
+contents and a button into Home, matching the Personnel Ledger theme.
 """
 
 import streamlit as st
@@ -28,7 +32,8 @@ apply_custom_theme()
 # for that page to show, so it's left out of the sidebar rather than
 # opening onto an empty or crashing page.
 pages = [
-    st.Page("views/home.py", title="Home", default=True),
+    st.Page("views/welcome.py", title="Welcome", default=True),
+    st.Page("views/home.py", title="Home"),
     st.Page("views/upload_data.py", title="Upload Data"),
     st.Page("views/data_cleaning.py", title="Data Cleaning"),
     st.Page("views/finance.py", title="Finance"),
@@ -57,4 +62,3 @@ with st.sidebar:
     render_sidebar_socials()
 
 pg.run()
-

@@ -84,18 +84,18 @@ col1, col2 = st.columns(2)
 with col1:
     st.markdown("""
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C5CBF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2F4B3C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="1" x2="12" y2="23"></line>
                 <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
             </svg>
-            <h3 style="margin: 0; font-family: 'Playfair Display', serif; color: #2A1F4D; font-size: 1.25rem;">Average Compensation by Department</h3>
+            <h3 style="margin: 0; font-family: 'Playfair Display', serif; color: #1E2A24; font-size: 1.25rem;">Average Compensation by Department</h3>
         </div>
     """, unsafe_allow_html=True)
     st.caption("Click a bar to filter every other chart on this page by that department.")
     
     dept_data = cross_filter(df, exclude="dept")
     dept_agg = dept_data.groupby("department")["salary"].mean().reindex(FIXED_DEPTS).reset_index()
-    fig = px.bar(dept_agg, x="department", y="salary", color_discrete_sequence=["#9575CD"])
+    fig = px.bar(dept_agg, x="department", y="salary", color_discrete_sequence=["#7C8F82"])
     fig.update_yaxes(tickprefix="$", tickformat=",.0f")
     fig = style_fig(fig)
     fig.update_layout(
@@ -112,12 +112,12 @@ with col1:
 with col2:
     st.markdown("""
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C5CBF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2F4B3C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                 <line x1="8" y1="21" x2="16" y2="21"></line>
                 <line x1="12" y1="17" x2="12" y2="21"></line>
             </svg>
-            <h3 style="margin: 0; font-family: 'Playfair Display', serif; color: #2A1F4D; font-size: 1.25rem;">Compensation Distribution</h3>
+            <h3 style="margin: 0; font-family: 'Playfair Display', serif; color: #1E2A24; font-size: 1.25rem;">Compensation Distribution</h3>
         </div>
     """, unsafe_allow_html=True)
     st.caption("Click a salary band to filter every other chart.")
@@ -125,7 +125,7 @@ with col2:
     bin_data = cross_filter(df, exclude="bin")
     bin_agg = bin_data["salary_bin"].value_counts().reindex(bin_labels).fillna(0).reset_index()
     bin_agg.columns = ["salary_bin", "count"]
-    fig2 = px.bar(bin_agg, x="salary_bin", y="count", color_discrete_sequence=["#7C5CBF"])
+    fig2 = px.bar(bin_agg, x="salary_bin", y="count", color_discrete_sequence=["#2F4B3C"])
     fig2.update_layout(
         xaxis_title="Salary Range", yaxis_title="Employees",
         margin=dict(l=40, r=20, t=30, b=40),
@@ -154,7 +154,7 @@ with col3:
     perf_data = cross_filter(df, exclude="perf")
     if perf_data["performance_score"].notna().any():
         perf_agg = perf_data.groupby("performance_score")["salary"].mean().reindex(FIXED_PERF).reset_index()
-        fig3 = px.bar(perf_agg, x="performance_score", y="salary", color_discrete_sequence=["#5B3E96"])
+        fig3 = px.bar(perf_agg, x="performance_score", y="salary", color_discrete_sequence=["#4C6558"])
         fig3.update_yaxes(tickprefix="$", tickformat=",.0f")
         fig3 = style_fig(fig3)
         fig3.update_layout(
@@ -176,7 +176,7 @@ with col4:
     status_agg = status_data.groupby("is_active")["salary"].mean()
     status_labels = [label for _, label in FIXED_STATUS]
     status_values = [status_agg.get(val, np.nan) for val, _ in FIXED_STATUS]
-    fig4 = px.bar(x=status_labels, y=status_values, color_discrete_sequence=["#B39DDB", "#5B3E96"])
+    fig4 = px.bar(x=status_labels, y=status_values, color_discrete_sequence=["#C9BFA3", "#4C6558"])
     fig4.update_yaxes(tickprefix="$", tickformat=",.0f")
     fig4 = style_fig(fig4)
     fig4.update_layout(

@@ -5,77 +5,103 @@ import streamlit as st
 def apply_custom_theme():
     st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
-    /* ============ Base / light content area (matches the Power BI look) ============ */
+    /* =====================================================================
+       PERSONNEL LEDGER — design concept
+       Paper cream content area + dark ledger-green "cover" sidebar.
+       Serif for headings (like a bound register's title page), monospace
+       for every number (salaries, %, dates — aligned like a real ledger),
+       Inter for body copy. Hairline rules instead of card-and-shadow kit;
+       nothing floats, nothing glows, one accent color, no gradients.
+       ===================================================================== */
+
+    :root {
+        --paper: #F6F3EC;
+        --paper-line: #DED5C0;
+        --ink: #1E2A24;
+        --ink-soft: #5B6259;
+        --cover: #1C2A22;
+        --cover-line: #33453A;
+        --cover-text: #E9E4D6;
+        --ledger: #2F4B3C;
+        --ledger-soft: #7C8F82;
+        --alert: #8C3B2E;
+        --alert-bg: #F1E4DF;
+    }
+
+    /* ============ Base / paper content area ============ */
     .stApp {
-        background-color: #F5F2FB;
-        color: #2E2350;
+        background-color: var(--paper);
+        color: var(--ink);
         font-family: 'Inter', sans-serif;
     }
     [data-testid="stAppViewContainer"] > .main {
-        background-color: #F5F2FB;
+        background-color: var(--paper);
     }
     [data-testid="stHeader"] { background-color: rgba(0,0,0,0); }
 
-    /* Headings — Playfair Display for a classy, slightly vintage feel,
-       Inter for everything else so it stays practical and readable */
+    /* Headings — serif title-page feel, no letter-spacing tricks, no caps */
     h1, h2, h3 {
-        font-family: 'Playfair Display', serif !important;
-        color: #2A1F4D !important;
+        font-family: 'Source Serif 4', serif !important;
+        color: var(--ink) !important;
         font-weight: 600;
-        letter-spacing: 0.2px;
+    }
+    h1 {
+        border-bottom: 2px solid var(--ledger);
+        padding-bottom: 10px;
     }
     [data-testid="stCaptionContainer"], .stCaption {
-        color: #6B5E92 !important;
+        color: var(--ink-soft) !important;
     }
 
-    /* ============ Sidebar (dark purple, logo pinned at the very top) ============ */
+    /* Numbers everywhere read like ledger entries, not UI chrome */
+    [data-testid="stMetricValue"], .kpi-value, .quality-score-inner,
+    [data-testid="stDataFrame"] * , .step-num {
+        font-family: 'JetBrains Mono', monospace !important;
+    }
+
+    /* ============ Sidebar — the ledger's cover ============ */
     [data-testid="stSidebar"] {
-        background-color: #17122B;
-        border-right: none;
+        background-color: var(--cover);
+        border-right: 1px solid var(--cover-line);
     }
     [data-testid="stSidebar"] > div:first-child {
-        padding-top: 1.2rem;
+        padding-top: 1.4rem;
         display: flex;
         flex-direction: column;
         min-height: 100vh;
     }
 
+    /* Wordmark instead of a logo card — just a title on the cover */
     .sidebar-logo-card {
-        background: #FFFFFF;
-        border-radius: 18px;
-        padding: 14px 10px 10px 10px;
-        margin: 0 14px 22px 14px;
-        text-align: center;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-    }
-    .sidebar-logo-card img {
-        border-radius: 10px;
-        max-width: 100%;
+        padding: 0 20px 18px 20px;
+        margin: 0 0 18px 0;
+        border-bottom: 1px solid var(--cover-line);
     }
     .sidebar-logo-fallback {
-        color: #2A1F4D;
-        font-family: 'Playfair Display', serif;
-        font-weight: 700;
-        font-size: 1.2rem;
-        margin: 6px 0 0 0;
+        color: var(--cover-text);
+        font-family: 'Source Serif 4', serif;
+        font-weight: 600;
+        font-size: 1.15rem;
+        margin: 0;
     }
 
-    /* Sidebar page navigation — rendered by hand via st.page_link() in
-       app.py (position="hidden" turns off st.navigation()'s own nav UI,
-       since it insists on a fixed slot near the top of the sidebar that
-       can't be moved below the logo). Same big rounded "button" look. */
-    [data-testid="stPageLink"] { margin-bottom: 8px; padding: 0 10px; }
+    /* Sidebar navigation — folder tabs, not pill buttons. Each tab is flush
+       on the cover; the active one takes on the PAPER color, so it visually
+       reads as "this is the page you're on top of" instead of a highlighted
+       button among buttons. */
+    [data-testid="stPageLink"] { margin-bottom: 2px; padding: 0 12px; }
     [data-testid="stPageLink"] a {
-        border-radius: 12px !important;
-        padding: 12px 16px !important;
-        font-size: 0.95rem !important;
-        font-weight: 600 !important;
-        color: #E4DDF7 !important;
-        background: #241D42 !important;
-        border: 1px solid #362B60;
-        transition: background 0.15s ease, color 0.15s ease;
+        border-radius: 6px 0 0 6px !important;
+        padding: 10px 14px !important;
+        font-size: 0.92rem !important;
+        font-weight: 500 !important;
+        color: var(--ledger-soft) !important;
+        background: transparent !important;
+        border: none !important;
+        border-left: 3px solid transparent !important;
+        transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
         opacity: 1 !important;
         width: 100%;
     }
@@ -85,178 +111,259 @@ def apply_custom_theme():
         opacity: 1 !important;
     }
     [data-testid="stPageLink"] a:hover {
-        background: linear-gradient(135deg, #3B2E68 0%, #4F3B8C 100%) !important;
-        color: #FFFFFF !important;
-        border-color: #4F3B8C;
+        background: var(--cover-line) !important;
+        color: var(--cover-text) !important;
     }
-    /* st.page_link decides "current page" styling itself in JS and never
-       exposes it as a selectable HTML attribute — so app.py marks the
-       active page from Python with a tiny <div class="active-page-marker">
-       right before it, and :has() lets this rule reach forward from that
-       marker's container to the NEXT container's page-link. */
+    /* Active page: same trick as before (:has() reads a marker div app.py
+       places just before the active link) but now it "pulls" the tab onto
+       the paper instead of lighting up a gradient pill. */
     div:has(> .active-page-marker) + div [data-testid="stPageLink"] a {
-        background: linear-gradient(135deg, #7C5CBF 0%, #9B7FD4 100%) !important;
-        color: #FFFFFF !important;
-        font-weight: 700 !important;
-        border-color: transparent;
-        box-shadow: 0 4px 14px rgba(124, 92, 191, 0.45);
+        background: var(--paper) !important;
+        color: var(--ink) !important;
+        font-weight: 600 !important;
+        border-left: 3px solid var(--alert) !important;
     }
 
-    /* ============ KPI cards (white, rounded, soft shadow) ============ */
+    /* ============ KPI cards (st.metric) — hairline row, no card box ============ */
     [data-testid="stMetric"] {
-        background: #FFFFFF;
-        border: 1px solid #EAE4F7;
-        padding: 16px 20px;
-        border-radius: 14px;
-        box-shadow: 0 3px 14px rgba(90, 70, 150, 0.08);
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--paper-line);
+        padding: 4px 4px 12px 4px;
+        border-radius: 0;
     }
     [data-testid="stMetricLabel"] {
-        color: #8A7BB8 !important;
-        font-weight: 600;
+        color: var(--ink-soft) !important;
+        font-weight: 500;
         font-size: 0.82rem !important;
-        text-transform: uppercase;
-        letter-spacing: 0.4px;
     }
     [data-testid="stMetricValue"] {
-        color: #2A1F4D !important;
-        font-weight: 700;
-        font-size: 1.7rem !important;
-        font-family: 'Playfair Display', serif !important;
+        color: var(--ink) !important;
+        font-weight: 600;
+        font-size: 1.6rem !important;
     }
 
-    /* ============ Icon KPI cards (custom HTML — used where a per-card
-       icon is wanted; same visual language as stMetric above) ============ */
-    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 8px 0 20px 0; }
+    /* ============ Icon KPI cards (custom HTML) — ledger-row style ============ */
+    .kpi-row {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0; margin: 8px 0 20px 0;
+        border-top: 1px solid var(--paper-line);
+    }
     .kpi-icon-card {
-        background: #FFFFFF;
-        border: 1px solid #EAE4F7;
-        border-radius: 14px;
-        padding: 16px 20px;
-        box-shadow: 0 3px 14px rgba(90, 70, 150, 0.08);
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid var(--paper-line);
+        border-right: 1px solid var(--paper-line);
+        border-radius: 0;
+        padding: 14px 18px;
         display: flex;
         align-items: flex-start;
         gap: 12px;
     }
     .kpi-icon-card .kpi-icon {
-        width: 38px; height: 38px; flex-shrink: 0;
-        border-radius: 10px;
-        background: linear-gradient(135deg, #7C5CBF 0%, #9B7FD4 100%);
+        width: 30px; height: 30px; flex-shrink: 0;
+        border-radius: 3px;
+        background: var(--ledger);
         display: flex; align-items: center; justify-content: center;
     }
-    .kpi-icon-card .kpi-icon svg { width: 20px; height: 20px; stroke: #FFFFFF; }
-    .kpi-icon-card .kpi-label { color: #8A7BB8; font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; }
-    .kpi-icon-card .kpi-value { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.55rem; color: #2A1F4D; margin-top: 2px; }
-    .kpi-icon-card .kpi-delta { font-size: 0.8rem; font-weight: 600; margin-top: 2px; }
-    .kpi-icon-card .kpi-delta.up { color: #3E9B5C; }
-    .kpi-icon-card .kpi-delta.down { color: #C0524A; }
+    .kpi-icon-card .kpi-icon svg { width: 16px; height: 16px; stroke: var(--paper); }
+    .kpi-icon-card .kpi-label { color: var(--ink-soft); font-weight: 500; font-size: 0.78rem; }
+    .kpi-icon-card .kpi-value { font-weight: 600; font-size: 1.4rem; color: var(--ink); margin-top: 2px; }
+    .kpi-icon-card .kpi-delta { font-size: 0.8rem; font-weight: 500; margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+    .kpi-icon-card .kpi-delta.up { color: var(--ledger); }
+    .kpi-icon-card .kpi-delta.down { color: var(--alert); }
 
-    /* ============ Data Quality Score badge ============ */
+    /* ============ Data Quality Score — a stamped seal, not a donut gauge ============ */
     .quality-score-card {
-        background: #FFFFFF;
-        border: 1px solid #EAE4F7;
-        border-radius: 16px;
-        padding: 20px 24px;
-        box-shadow: 0 3px 14px rgba(90, 70, 150, 0.08);
+        background: transparent;
+        border: 1px dashed var(--ledger-soft);
+        border-radius: 4px;
+        padding: 18px 22px;
         display: flex; align-items: center; gap: 20px;
         margin: 8px 0 20px 0;
     }
     .quality-score-ring {
-        width: 84px; height: 84px; border-radius: 50%;
+        width: 72px; height: 72px; border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        background: conic-gradient(#7C5CBF calc(var(--pct) * 1%), #EFE9FA 0);
+        border: 3px solid var(--ledger);
         flex-shrink: 0;
-    }
-    .quality-score-ring::before {
-        content: "";
-        position: absolute;
+        transform: rotate(-8deg);
     }
     .quality-score-inner {
-        width: 66px; height: 66px; border-radius: 50%; background: #FFFFFF;
-        display: flex; align-items: center; justify-content: center;
-        font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.15rem; color: #2A1F4D;
+        font-weight: 700; font-size: 1.05rem; color: var(--ledger);
+        transform: rotate(8deg);
     }
-    .quality-score-text h3 { margin: 0 0 4px 0; font-size: 1.1rem; }
-    .quality-score-text p { margin: 0; color: #6B5E92; font-size: 0.9rem; }
+    .quality-score-text h3 { margin: 0 0 4px 0; font-size: 1.05rem; }
+    .quality-score-text p { margin: 0; color: var(--ink-soft); font-size: 0.88rem; }
 
-    /* ============ Numbered workflow steps (cleaning audit log) ============ */
+    /* ============ Numbered workflow steps (cleaning audit log) — memo list ============ */
     .workflow-step {
         display: flex; gap: 14px; align-items: flex-start;
-        background: #FFFFFF; border: 1px solid #EAE4F7; border-radius: 12px;
-        padding: 12px 16px; margin: 8px 0;
-        box-shadow: 0 2px 10px rgba(90, 70, 150, 0.06);
+        background: transparent; border: none; border-bottom: 1px solid var(--paper-line);
+        border-radius: 0;
+        padding: 10px 4px; margin: 0;
     }
     .workflow-step .step-num {
-        width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
-        background: linear-gradient(135deg, #7C5CBF 0%, #9B7FD4 100%);
-        color: #FFFFFF; font-weight: 700; font-size: 0.85rem;
+        width: 22px; height: 22px; border-radius: 3px; flex-shrink: 0;
+        background: var(--ledger);
+        color: var(--paper); font-weight: 600; font-size: 0.78rem;
         display: flex; align-items: center; justify-content: center;
     }
-    .workflow-step .step-text { color: #2E2350; font-size: 0.92rem; padding-top: 3px; }
+    .workflow-step .step-text { color: var(--ink); font-size: 0.92rem; padding-top: 2px; }
 
-    /* ============ Chart cards — every plotly chart sits in its own white card ============ */
+    /* ============ Chart panels — flush on the page, ruled off, no card ============ */
     [data-testid="stPlotlyChart"] {
-        background: #FFFFFF;
-        border: 1px solid #EAE4F7;
-        border-radius: 16px;
-        padding: 14px;
-        box-shadow: 0 3px 14px rgba(90, 70, 150, 0.08);
+        background: transparent;
+        border: none;
+        border-top: 1px solid var(--paper-line);
+        border-radius: 0;
+        padding: 10px 0 0 0;
     }
 
-    /* ============ Filters bar (expander) styled as a light card ============ */
+    /* ============ Filters bar ============ */
     .streamlit-expanderHeader {
-        background-color: #FFFFFF !important;
-        border: 1px solid #EAE4F7 !important;
-        border-radius: 12px;
-        color: #2A1F4D !important;
+        background-color: transparent !important;
+        border: none !important;
+        border-bottom: 1px solid var(--paper-line) !important;
+        border-radius: 0;
+        color: var(--ink) !important;
         font-weight: 600;
     }
     [data-testid="stExpander"] {
-        background-color: #FFFFFF;
-        border: 1px solid #EAE4F7 !important;
-        border-radius: 12px;
-        box-shadow: 0 3px 14px rgba(90, 70, 150, 0.06);
+        background-color: transparent;
+        border: none !important;
+        border-radius: 0;
     }
 
-    /* Multiselect / slider chips in the purple family */
+    /* Multiselect / slider chips */
     [data-baseweb="tag"] {
-        background-color: #7C5CBF !important;
+        background-color: var(--ledger) !important;
+        border-radius: 3px !important;
     }
-    .stSlider [data-baseweb="slider"] > div > div { background: #7C5CBF !important; }
+    .stSlider [data-baseweb="slider"] > div > div { background: var(--ledger) !important; }
 
-    /* ============ Dataframes ============ */
+    /* ============ Dataframes — ruled ledger table ============ */
     [data-testid="stDataFrame"] {
-        background: #FFFFFF;
-        border: 1px solid #EAE4F7;
-        border-radius: 14px;
-        overflow: hidden;
-        box-shadow: 0 3px 14px rgba(90, 70, 150, 0.08);
+        background: var(--paper);
+        border: none;
+        border-top: 1px solid var(--ink);
+        border-bottom: 1px solid var(--ink);
+        border-radius: 0;
     }
 
-    /* Buttons */
+    /* Buttons — flat, no gradient */
     .stButton > button {
-        background: linear-gradient(135deg, #7C5CBF 0%, #9B7FD4 100%);
-        color: #FFFFFF;
+        background: var(--ledger);
+        color: var(--paper);
         border: none;
-        border-radius: 10px;
+        border-radius: 3px;
         font-weight: 600;
         padding: 8px 20px;
     }
     .stButton > button:hover {
-        background: linear-gradient(135deg, #6B4DAE 0%, #8A6EC5 100%);
+        background: var(--ink);
     }
 
-    /* Info boxes (audit log lines) */
+    /* Info boxes */
     [data-testid="stAlert"] {
-        background-color: #FFFFFF;
-        border: 1px solid #EAE4F7;
-        border-radius: 10px;
-        color: #2E2350;
+        background-color: transparent;
+        border: none;
+        border-left: 3px solid var(--ledger);
+        border-radius: 0;
+        color: var(--ink);
+        padding-left: 14px;
     }
 
-    /* Social links footer (GitHub / LinkedIn / Portfolio) */
+    /* ============ Recommendation memos (severity-styled) ============ */
+    .memo-card {
+        border: 1px solid var(--paper-line);
+        border-radius: 2px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+        background: var(--paper);
+        position: relative;
+    }
+    .memo-card .memo-title {
+        font-family: 'Source Serif 4', serif;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 6px;
+    }
+    .memo-card .memo-detail { color: var(--ink-soft); font-size: 0.92rem; }
+    .memo-stamp {
+        position: absolute; top: 14px; right: 18px;
+        border: 2px solid var(--alert);
+        color: var(--alert);
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        font-size: 0.72rem;
+        letter-spacing: 1px;
+        padding: 3px 9px;
+        border-radius: 3px;
+        transform: rotate(6deg);
+        opacity: 0.85;
+    }
+
+    /* ============ Cover page — title page + table of contents ============ */
+    .cover-wrap {
+        max-width: 620px;
+        margin: 30px auto 0 auto;
+    }
+    .cover-eyebrow {
+        color: var(--ink-soft);
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+    .cover-title {
+        font-family: 'Source Serif 4', serif;
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: var(--ink);
+        margin: 0 0 6px 0;
+        border-bottom: 2px solid var(--ledger);
+        padding-bottom: 14px;
+    }
+    .cover-sub {
+        color: var(--ink-soft);
+        font-size: 0.95rem;
+        margin: 10px 0 26px 0;
+        line-height: 1.6;
+    }
+    .toc-heading {
+        font-family: 'Source Serif 4', serif;
+        font-size: 1.05rem;
+        color: var(--ink);
+        margin-bottom: 10px;
+    }
+    .toc-row {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        padding: 9px 0;
+        border-bottom: 1px dotted var(--paper-line);
+    }
+    .toc-row .toc-name {
+        font-weight: 600;
+        color: var(--ink);
+        white-space: nowrap;
+    }
+    .toc-row .toc-leader {
+        flex: 1;
+        border-bottom: 1px dotted var(--ledger-soft);
+        transform: translateY(-4px);
+    }
+    .toc-row .toc-desc {
+        color: var(--ink-soft);
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    /* Social links footer — plain text links on the cover, no icon tiles */
     .sidebar-social {
         margin-top: auto;
         padding-top: 16px;
+        border-top: 1px solid var(--cover-line);
         display: flex;
         justify-content: center;
         gap: 14px;
@@ -265,21 +372,19 @@ def apply_custom_theme():
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        background: #241D42;
-        border: 1px solid #362B60;
-        transition: background 0.15s ease, transform 0.15s ease;
+        width: 32px;
+        height: 32px;
+        border-radius: 3px;
+        background: transparent;
+        border: 1px solid var(--cover-line);
+        transition: border-color 0.12s ease;
     }
     .sidebar-social a:hover {
-        background: linear-gradient(135deg, #7C5CBF 0%, #9B7FD4 100%);
-        transform: translateY(-2px);
+        border-color: var(--cover-text);
     }
-    .sidebar-social svg { width: 20px; height: 20px; fill: #E4DDF7; }
-    .sidebar-social a:hover svg { fill: #FFFFFF; }
+    .sidebar-social svg { width: 16px; height: 16px; fill: var(--cover-text); }
 
-    hr { border-color: #E4DCF5 !important; }
+    hr { border-color: var(--paper-line) !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -288,10 +393,7 @@ def render_sidebar_logo():
     logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "logo.jpeg")
     with st.sidebar:
         st.markdown('<div class="sidebar-logo-card">', unsafe_allow_html=True)
-        if os.path.exists(logo_path):
-            st.image(logo_path, width='stretch')
-        else:
-            st.markdown('<p class="sidebar-logo-fallback">Rokaia Rezk</p>', unsafe_allow_html=True)
+        st.markdown('<p class="sidebar-logo-fallback">Rokaia Rezk</p>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
 
@@ -327,14 +429,8 @@ ICON_CHECK = """<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strok
 
 def kpi_icon_card(icon_svg, label, value, delta=None, delta_up=True):
     """Builds one icon-KPI card as an HTML string. Pass a list of these
-    to render_kpi_row() — this is the icon-card equivalent of st.metric,
-    used where a per-card icon (like the HR Pulse reference) is wanted.
-
-    Returns a single-line string on purpose (no embedded newlines) —
-    Markdown treats any line indented 4+ spaces as a code block and
-    stops parsing HTML from that point on, which is exactly what was
-    turning these cards into visible raw <div> text instead of a
-    rendered card."""
+    to render_kpi_row() — single-line string on purpose (Markdown treats
+    indented multi-line HTML as a code block otherwise)."""
     delta_html = ""
     if delta:
         cls = "up" if delta_up else "down"
@@ -350,14 +446,11 @@ def render_kpi_row(cards):
 
 
 def render_quality_score(score_pct, title="Data Quality Score", subtitle=None):
-    """A prominent circular score badge, like the reference dashboard's
-    '98.5%' indicator — score_pct is 0-100. Single-line HTML for the
-    same reason as kpi_icon_card() above — no indented multi-line
-    string that Markdown would mistake for a code block."""
+    """A stamped seal instead of a circular percentage gauge — score_pct is 0-100."""
     subtitle = subtitle or "Based on completeness, duplicates, and outlier checks on this dataset."
     st.markdown(
         f'<div class="quality-score-card">'
-        f'<div class="quality-score-ring" style="--pct: {score_pct};">'
+        f'<div class="quality-score-ring">'
         f'<div class="quality-score-inner">{score_pct:.0f}%</div></div>'
         f'<div class="quality-score-text"><h3>{title}</h3><p>{subtitle}</p></div></div>',
         unsafe_allow_html=True,
@@ -365,11 +458,33 @@ def render_quality_score(score_pct, title="Data Quality Score", subtitle=None):
 
 
 def render_workflow_steps(steps):
-    """steps: list of plain-text strings (e.g. the cleaning audit log) —
-    rendered as numbered cards instead of plain info boxes."""
+    """steps: list of plain-text strings (e.g. the cleaning audit log)."""
     html = "".join(
         f'<div class="workflow-step"><div class="step-num">{i}</div>'
         f'<div class="step-text">{step}</div></div>'
         for i, step in enumerate(steps, 1)
     )
     st.markdown(html, unsafe_allow_html=True)
+
+
+def render_toc(items):
+    """items: list of (name, description) tuples — rendered as a dotted
+    table-of-contents list, like the front page of a bound register."""
+    rows = "".join(
+        f'<div class="toc-row"><span class="toc-name">{name}</span>'
+        f'<span class="toc-leader"></span><span class="toc-desc">{desc}</span></div>'
+        for name, desc in items
+    )
+    st.markdown(f'<div class="toc-heading">Contents</div>{rows}', unsafe_allow_html=True)
+
+
+def render_memo_card(title, detail, severity="low"):
+    """A recommendation styled as an interoffice memo. severity='high' gets
+    a rotated 'URGENT' stamp; 'medium'/'low' render as a plain memo."""
+    stamp = '<div class="memo-stamp">URGENT</div>' if severity == "high" else ""
+    st.markdown(
+        f'<div class="memo-card">{stamp}'
+        f'<div class="memo-title">{title}</div>'
+        f'<div class="memo-detail">{detail}</div></div>',
+        unsafe_allow_html=True,
+    )

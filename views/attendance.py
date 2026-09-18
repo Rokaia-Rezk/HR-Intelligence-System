@@ -76,7 +76,7 @@ if HAS_ABSENCES:
     with col1:
         st.subheader("Average Absences by Department")
         st.caption("Click a bar to filter everything else on this page by that department.")
-        fig = px.bar(dept_abs, x="department", y="absences", color_discrete_sequence=["#B39DDB"])
+        fig = px.bar(dept_abs, x="department", y="absences", color_discrete_sequence=["#C9BFA3"])
         fig = style_fig(fig)
         fig.update_xaxes(tickangle=-25)
         st.plotly_chart(fig, width='stretch', theme=None,
@@ -87,7 +87,7 @@ if HAS_ABSENCES:
 
     with col2:
         st.subheader("Absence Frequency Distribution")
-        fig2 = px.histogram(df_view, x="absences", nbins=20, color_discrete_sequence=["#7C5CBF"])
+        fig2 = px.histogram(df_view, x="absences", nbins=20, color_discrete_sequence=["#2F4B3C"])
         st.plotly_chart(style_fig(fig2), width='stretch', theme=None)
         if len(df_view):
             high_risk = int((df_view["absences"] >= df_view["absences"].quantile(0.9)).sum())
@@ -120,12 +120,12 @@ if HAS_ABSENCES or HAS_LATE:
         abs_by_status = df_view.groupby("is_active")["absences"].mean()
         abs_vals = [abs_by_status.get(True, float("nan")), abs_by_status.get(False, float("nan"))]
         fig_combo.add_trace(go.Bar(name="Avg Absences", x=status_labels, y=abs_vals,
-                                    marker_color="#B39DDB", yaxis="y1"))
+                                    marker_color="#C9BFA3", yaxis="y1"))
     if HAS_LATE:
         late_by_status = df_view.groupby("is_active")["days_late"].mean()
         late_vals = [late_by_status.get(True, float("nan")), late_by_status.get(False, float("nan"))]
         fig_combo.add_trace(go.Bar(name="Avg Days Late", x=status_labels, y=late_vals,
-                                    marker_color="#5B3E96", yaxis="y2" if HAS_ABSENCES else "y1"))
+                                    marker_color="#4C6558", yaxis="y2" if HAS_ABSENCES else "y1"))
 
     fig_combo = style_fig(fig_combo)
     layout_kwargs = {"barmode": "group"}

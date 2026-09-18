@@ -86,7 +86,7 @@ if HAS_PERF:
         # events across Streamlit versions, and a fixed alphabetical order
         # keeps a bar's index mapped to the same tier every rerun.
         perf_counts_fixed = perf_counts.set_index("performance_score").reindex(FIXED_PERF).fillna(0).reset_index()
-        fig = px.bar(perf_counts_fixed, x="performance_score", y="count", color_discrete_sequence=["#9575CD"])
+        fig = px.bar(perf_counts_fixed, x="performance_score", y="count", color_discrete_sequence=["#7C8F82"])
         fig = style_fig(fig)
         fig.update_xaxes(tickangle=-20)
         st.plotly_chart(fig, width='stretch', theme=None,
@@ -104,8 +104,8 @@ if HAS_ENG and HAS_SAT:
         # Single color, not colored by department — a dominant department
         # plus near-invisible slivers isn't a real breakdown; the
         # correlation caption below carries the actual insight here.
-        fig2.update_traces(marker=dict(size=8, opacity=0.65, color="#7C5CBF",
-                                        line=dict(width=0.5, color="#FFFFFF")))
+        fig2.update_traces(marker=dict(size=8, opacity=0.65, color="#2F4B3C",
+                                        line=dict(width=0.5, color="#F6F3EC")))
         st.plotly_chart(style_fig(fig2), width='stretch', theme=None)
         if len(df_view) > 1:
             corr = df_view["engagement_score"].corr(df_view["satisfaction_score"])
@@ -128,7 +128,7 @@ if HAS_PERF and HAS_PROJ:
                "useful for validating (or challenging) how 'high performer' is being defined.")
     if df_view["performance_score"].notna().any():
         fig4 = px.box(df_view.dropna(subset=["performance_score"]), x="performance_score", y="special_projects_count",
-                      color_discrete_sequence=["#5B3E96"])
+                      color_discrete_sequence=["#4C6558"])
         st.plotly_chart(style_fig(fig4), width='stretch', theme=None)
         if HAS_ENG and len(df_view) > 1:
             corr2 = df_view["special_projects_count"].corr(df_view["engagement_score"])

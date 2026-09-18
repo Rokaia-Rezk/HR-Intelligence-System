@@ -1,4 +1,4 @@
-# ⚡ HR Intelligence System
+# 📖 HR Intelligence System
 
 **A dataset-agnostic HR analytics platform — upload any HR export and get a full analytics suite, automatically.**
 
@@ -32,18 +32,26 @@ Swap the dataset — a different HR export, different column names, different st
 ### 📊 Analytics Pages
 | Page | What it shows |
 |---|---|
-| **Home** | Pipeline overview KPIs + dynamically generated Recommended Actions (highest-turnover department, top exit reason, pay-vs-turnover signal, lowest-engagement department) |
+| **Welcome** | The register's title page — a text-only cover with a table of contents, no stock imagery, leading into Home |
+| **Home** | Pipeline overview KPIs (raw vs. cleaned records, active workforce, departments, average compensation) |
 | **Finance & Compensation** | Payroll by department, salary distribution, salary vs. performance tier, salary vs. retention — every chart is click-to-filter and combines with the others |
 | **Performance & Engagement** | Performance tier breakdown, engagement vs. satisfaction, performance by department, special projects vs. performance |
 | **Attendance & Reliability** | Absences by department, absence distribution, a combined attendance-vs-attrition signal chart, and a high-risk watchlist |
 | **Recruitment & Turnover** | Sourcing channel volume *and* quality (turnover rate by source), top termination drivers, hiring trend over time, tenure-at-exit analysis |
+| **Recommended Actions** | Rule-based recommendations, generated fresh from whatever dataset is loaded, shown as memo cards — the highest-priority one gets a rotated "URGENT" stamp |
 | **Predictive Attrition** | A Random Forest classifier trained on historical outcomes, with transparent feature importances and a ranked risk watchlist for the current active workforce |
 
 ### 🖱️ Click-to-Filter Cross-Filtering
 Charts aren't just static — click a bar on most pages and every other chart/metric on that page filters to match, with selections combining (AND logic) across multiple charts. Built entirely on Streamlit's native `on_select`, no extra libraries.
 
-### 🎨 Custom Design System
-A fully custom lavender/dark-purple theme built to push past Streamlit's default look: a logo pinned at the top of the sidebar, custom navigation styling, icon-based KPI cards, a circular quality-score badge, numbered workflow steps, and social links (GitHub/LinkedIn/Portfolio) — all built with targeted CSS over Streamlit's component structure.
+### 🎨 Custom Design System — "Personnel Ledger"
+A fully custom theme built around the subject matter itself instead of a generic SaaS card kit: the system is styled like a bound personnel register rather than a dashboard app.
+- **Paper + cover, not cards and shadows** — a warm paper-cream content area, a dark ledger-green sidebar standing in for the register's cover, and hairline rules in place of floating white cards with drop shadows.
+- **Typography with a job to do** — a serif (Source Serif 4) for headings, like a title page; a monospace (JetBrains Mono) for every number — salaries, percentages, dates — so figures line up like real ledger entries; Inter for body copy.
+- **Folder-tab navigation** — the active sidebar page takes on the paper's own color and pulls left, reading as a tab you're currently on top of rather than a highlighted button among buttons.
+- **A cover page, not a hero image** — Welcome is a text-only title page (eyebrow, serif title, a two-line description, a dotted table of contents) rather than a stock photo or icon banner.
+- **Recommendations as memos** — each rule-based recommendation renders as an interoffice memo card; the single highest-priority one gets a rotated "URGENT" stamp instead of a generic colored alert box.
+- **One accent, used sparingly** — ledger green for structure and primary actions, a brick-red accent reserved for genuinely urgent signals (high turnover, the memo stamp) — no purple, no gradients.
 
 ## How It Works — Data Flow
 
@@ -74,14 +82,14 @@ Because every page downstream only ever sees canonical field names, swapping the
 - **Pandas** — data manipulation and the cleaning pipeline
 - **Plotly** — all interactive charts, including click-to-filter selection
 - **scikit-learn** — Random Forest classifier for attrition prediction
-- **Custom CSS** — full visual theme layered over Streamlit's default components
+- **Custom CSS** — the Personnel Ledger theme, layered over Streamlit's default components
 
 ## Project Structure
 
 ```
 hr_system/
 ├── app.py                      # Entry point — theme, sidebar, dynamic page list
-├── style.py                    # Full custom theme + reusable UI components
+├── style.py                    # Personnel Ledger theme + reusable UI components
 ├── filters.py                  # Shared slicers + chart styling + click-filter helper
 ├── data_loader.py              # Single source of truth for data access (default or uploaded)
 ├── data_cleaner.py             # Rule-based cleaning logic
@@ -91,14 +99,16 @@ hr_system/
 ├── .streamlit/
 │   └── config.toml             # Theme colors, upload size limit
 └── views/
-    ├── home.py                 # KPI overview + dynamic recommendations
-    ├── upload_data.py          # Upload + column-mapping confirmation UI
-    ├── data_cleaning.py        # Quality score + before/after + audit log
-    ├── finance.py               # Cross-filtered compensation analytics
-    ├── performance.py           # Engagement/performance analytics
-    ├── attendance.py            # Absence/lateness analytics
-    ├── recruitment.py           # Sourcing + turnover + tenure analytics
-    └── predictive_attrition.py  # ML-based attrition risk scoring
+    ├── welcome.py               # Register cover / title page + table of contents
+    ├── home.py                  # KPI pipeline overview
+    ├── upload_data.py           # Upload + column-mapping confirmation UI
+    ├── data_cleaning.py         # Quality score + before/after + audit log
+    ├── finance.py                # Cross-filtered compensation analytics
+    ├── performance.py            # Engagement/performance analytics
+    ├── attendance.py             # Absence/lateness analytics
+    ├── recruitment.py            # Sourcing + turnover + tenure analytics
+    ├── recommendations.py        # Rule-based recommendations, shown as memo cards
+    └── predictive_attrition.py   # ML-based attrition risk scoring
 ```
 
 ## Getting Started
@@ -123,6 +133,7 @@ Open `http://localhost:8501`. The bundled sample dataset (`HRDataset_v14.csv`) l
 
 Ideas for later — none of this exists yet, this is the current project's Streamlit implementation only:
 
+- [ ] **Natural-language data assistant** — a small function-calling agent (not free-form RAG, and not raw LLM-generated code) that lets someone ask a plain-language question about the currently loaded data ("what's the average salary in Sales?") and get an answer computed through a fixed, safe set of query tools built on the canonical schema, rather than an LLM writing and executing arbitrary Pandas code.
 - [ ] A full-stack rebuild (separate backend + custom HTML/CSS frontend) for complete design control beyond what's achievable by styling Streamlit's components
 - [ ] Persist uploaded datasets across sessions (currently session-only — closing the tab returns you to the sample dataset)
 - [ ] Expand the predictive model with additional algorithms for comparison

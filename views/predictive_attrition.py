@@ -96,7 +96,7 @@ importances = pd.Series(clf.feature_importances_, index=feature_cols)
 importances.index = [i.replace("_enc", "") for i in importances.index]
 importances = importances.sort_values(ascending=True)
 fig_imp = px.bar(x=importances.values, y=importances.index, orientation="h",
-                  color_discrete_sequence=["#7C5CBF"])
+                  color_discrete_sequence=["#2F4B3C"])
 fig_imp.update_layout(xaxis_title="Relative Importance", yaxis_title="")
 st.plotly_chart(style_fig(fig_imp), width='stretch', theme=None)
 top_feat = importances.index[-1]

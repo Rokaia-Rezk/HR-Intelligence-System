@@ -88,7 +88,7 @@ if HAS_SOURCE:
         # Long source names (e.g. "On-line Web application") read poorly as a
         # vertical column chart, so this is a horizontal bar, sorted.
         fig = px.bar(src_counts_sorted, x="count", y="recruitment_source",
-                     orientation="h", color_discrete_sequence=["#9575CD"])
+                     orientation="h", color_discrete_sequence=["#7C8F82"])
         st.plotly_chart(style_fig(fig), width='stretch', theme=None,
                          on_select="rerun", selection_mode="points", key="recruit_src_chart")
         best_source = src_counts.sort_values("count", ascending=False).iloc[0]
@@ -101,7 +101,7 @@ if HAS_SOURCE:
         ).sort_values(ascending=False).reset_index(name="turnover_rate")
         if not src_turnover.empty:
             fig1b = px.bar(src_turnover, x="turnover_rate", y="recruitment_source", orientation="h",
-                           color_discrete_sequence=["#5B3E96"])
+                           color_discrete_sequence=["#4C6558"])
             fig1b.update_xaxes(ticksuffix="%")
             st.plotly_chart(style_fig(fig1b), width='stretch', theme=None)
             worst_src = src_turnover.iloc[0]
@@ -118,7 +118,7 @@ if HAS_REASON:
         top_reasons = reason_counts.head(8).sort_values("count")
         if not top_reasons.empty:
             fig2 = px.bar(top_reasons, x="count", y="reason", orientation="h",
-                          color_discrete_sequence=["#7C5CBF"])
+                          color_discrete_sequence=["#2F4B3C"])
             st.plotly_chart(style_fig(fig2), width='stretch', theme=None)
             top_reason = reason_counts.sort_values("count", ascending=False).iloc[0]
             st.caption(f"**{top_reason['reason']}** is the single biggest reason people leave "
@@ -132,7 +132,7 @@ if HAS_HIRE_DATE:
     if not hires.empty:
         hires["hire_year"] = hires["hire_date"].dt.year
         yearly = hires.groupby("hire_year").size().reset_index(name="hires")
-        fig3 = px.line(yearly, x="hire_year", y="hires", markers=True, color_discrete_sequence=["#7C5CBF"])
+        fig3 = px.line(yearly, x="hire_year", y="hires", markers=True, color_discrete_sequence=["#2F4B3C"])
         st.plotly_chart(style_fig(fig3), width='stretch', theme=None)
     else:
         st.info("No hire-date data in what's currently shown.")
@@ -165,7 +165,7 @@ if HAS_HIRE_DATE and "termination_date" in df_view.columns and df_view["terminat
         tenure_counts = left_with_dates["tenure_bucket"].value_counts().reindex(TENURE_BUCKETS).fillna(0).reset_index()
         tenure_counts.columns = ["tenure_bucket", "exits"]
 
-        fig5 = px.bar(tenure_counts, x="tenure_bucket", y="exits", color_discrete_sequence=["#5B3E96"])
+        fig5 = px.bar(tenure_counts, x="tenure_bucket", y="exits", color_discrete_sequence=["#4C6558"])
         fig5.update_layout(xaxis_title="Tenure at Exit", yaxis_title="Number of Exits")
         st.plotly_chart(style_fig(fig5), width='stretch', theme=None)
 
