@@ -1,8 +1,8 @@
-# 📖 HR Intelligence System
+# HR Intelligence System
 
 **A dataset-agnostic HR analytics platform — upload any HR export and get a full analytics suite, automatically.**
 
-🔗 **Live demo:** [hr-intelligence.streamlit.app](https://hr-intelligence.streamlit.app/)
+**Live demo:** [hr-intelligence.streamlit.app](https://hr-intelligence.streamlit.app/)
 
 ---
 
@@ -14,13 +14,13 @@ Swap the dataset — a different HR export, different column names, different st
 
 ## Key Features
 
-### 🔄 Dataset-Agnostic Core
+### Dataset-Agnostic Core
 - **Canonical Schema** (`canonical_schema.py`) — 18 standard HR fields (`salary`, `department`, `performance_score`, etc.) that every other part of the system talks to, instead of raw column names.
 - **Auto-Mapping** (`schema_mapper.py`) — matches any incoming file's real column names to the canonical schema via exact + fuzzy matching, and remembers the mapping for next time.
 - **Upload Your Own Data** — a dedicated page lets you upload a CSV/XLSX, review the auto-detected column mapping, correct anything wrong, and load it. Every other page picks up the new dataset instantly, no code changes.
 - **Graceful Degradation** — if an uploaded dataset is missing a whole category of data (e.g. no engagement scores), the relevant page or chart section hides itself instead of crashing or showing `NaN`.
 
-### 🧹 Automated Data Cleaning
+### Automated Data Cleaning
 - Rule-based, transparent cleaning (`data_cleaner.py`) — no silent guesses:
   - A missing value is never blindly deleted or filled.
   - `termination_date` being empty means "still employed," not missing data.
@@ -29,7 +29,7 @@ Swap the dataset — a different HR export, different column names, different st
 - **Data Quality Score** — a single, honestly-computed percentage (completeness + duplicate check, correctly excluding fields where "empty" is a valid state).
 - A dynamic, numbered audit log explaining exactly what was found and what was done about it — regenerated fresh for whatever dataset is currently loaded.
 
-### 📊 Analytics Pages
+### Analytics Pages
 | Page | What it shows |
 |---|---|
 | **Welcome** | The register's title page — a text-only cover with a table of contents, no stock imagery, leading into Home |
@@ -39,12 +39,12 @@ Swap the dataset — a different HR export, different column names, different st
 | **Attendance & Reliability** | Absences by department, absence distribution, a combined attendance-vs-attrition signal chart, and a high-risk watchlist |
 | **Recruitment & Turnover** | Sourcing channel volume *and* quality (turnover rate by source), top termination drivers, hiring trend over time, tenure-at-exit analysis |
 | **Recommended Actions** | Rule-based recommendations, generated fresh from whatever dataset is loaded, shown as memo cards — the highest-priority one gets a rotated "URGENT" stamp |
-| **Predictive Attrition** | A Random Forest classifier trained on historical outcomes, with transparent feature importances and a ranked risk watchlist for the current active workforce |
+| **Predictive Attrition** | A Random Forest classifier trained on historical outcomes, with transparent feature importances, a ranked risk watchlist for the current active workforce, and a form to score any individual employee by name and get a plain-language explanation of what's driving their risk |
 
-### 🖱️ Click-to-Filter Cross-Filtering
+### Click-to-Filter Cross-Filtering
 Charts aren't just static — click a bar on most pages and every other chart/metric on that page filters to match, with selections combining (AND logic) across multiple charts. Built entirely on Streamlit's native `on_select`, no extra libraries.
 
-### 🎨 Custom Design System — "Personnel Ledger"
+### Custom Design System — "Personnel Ledger"
 A fully custom theme built around the subject matter itself instead of a generic SaaS card kit: the system is styled like a bound personnel register rather than a dashboard app.
 - **Paper + cover, not cards and shadows** — a warm paper-cream content area, a dark ledger-green sidebar standing in for the register's cover, and hairline rules in place of floating white cards with drop shadows.
 - **Typography with a job to do** — a serif (Source Serif 4) for headings, like a title page; a monospace (JetBrains Mono) for every number — salaries, percentages, dates — so figures line up like real ledger entries; Inter for body copy.
@@ -114,8 +114,8 @@ hr_system/
 ## Getting Started
 
 ```bash
-git clone https://github.com/Rokaia-Rezk/<repo-name>.git
-cd <repo-name>
+git clone https://github.com/Rokaia-Rezk/HR-Intelligence-System.git
+cd HR-Intelligence-System
 pip install -r requirements.txt
 streamlit run app.py
 ```

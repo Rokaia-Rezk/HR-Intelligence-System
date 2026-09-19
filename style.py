@@ -114,14 +114,19 @@ def apply_custom_theme():
         background: var(--cover-line) !important;
         color: var(--cover-text) !important;
     }
-    /* Active page: same trick as before (:has() reads a marker div app.py
-       places just before the active link) but now it "pulls" the tab onto
-       the paper instead of lighting up a gradient pill. */
-    div:has(> .active-page-marker) + div [data-testid="stPageLink"] a {
-        background: var(--paper) !important;
-        color: var(--ink) !important;
-        font-weight: 600 !important;
-        border-left: 3px solid var(--alert) !important;
+    /* Active page — rendered in app.py as plain styled markup (NOT a
+       st.page_link) for exactly the current page, so this class is ours
+       to control completely and never depends on guessing what attribute
+       Streamlit puts on its own generated links. */
+    .active-nav-item {
+        margin: 0 12px 2px 12px;
+        padding: 10px 14px;
+        border-radius: 6px 0 0 6px;
+        background: var(--paper);
+        color: var(--ink);
+        font-weight: 600;
+        font-size: 0.92rem;
+        border-left: 3px solid var(--alert);
     }
 
     /* ============ KPI cards (st.metric) — hairline row, no card box ============ */

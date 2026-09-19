@@ -13,6 +13,15 @@ of its own. We then build the sidebar by hand with st.page_link(), so
 the vertical order — logo, then pages, then social links — is
 whatever WE put it in and can never be overridden internally again.
 
+Active-page highlighting: NOT done via CSS guessing at Streamlit's
+internal DOM/attributes (that was tried twice and didn't render — see
+git history). Instead, the current page is rendered as a plain
+`.active-nav-item` div (styled in style.py) instead of a st.page_link
+at all — every other page still gets a real, clickable st.page_link.
+Since Python already knows which page is current (page.url_path ==
+pg.url_path), this can't silently fail the way a CSS-attribute guess
+can.
+
 "Welcome" is the register's title page and opens first (default=True).
 It's a plain cover — text only, no stock photo — with a table of
 contents and a button into Home, matching the Personnel Ledger theme.
@@ -52,13 +61,9 @@ with st.sidebar:
     render_sidebar_logo()
     for page in pages:
         if page.url_path == pg.url_path:
-            # st.page_link decides the "active" look itself in JS and never
-            # exposes it as an HTML attribute we could style — so instead
-            # we mark the active page from Python (comparing against pg,
-            # the Page st.navigation() says is currently running) and let
-            # the CSS in style.py pick up this marker via :has().
-            st.markdown('<div class="active-page-marker"></div>', unsafe_allow_html=True)
-        st.page_link(page)
+            st.markdown(f'<div class="active-nav-item">{page.title}</div>', unsafe_allow_html=True)
+        else:
+            st.page_link(page)
     render_sidebar_socials()
 
 pg.run()
